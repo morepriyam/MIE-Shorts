@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "nativedemo",
-    "slug": "nativedemo",
+    "name": "MIE-Shorts",
+    "slug": "MIE-Shorts",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "nativedemo",
+    "icon": "./assets/images/mielogo-text.webp",
+    "scheme": "mieshorts",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
