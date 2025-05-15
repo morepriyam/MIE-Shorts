@@ -6,6 +6,7 @@ import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from '
 const { width } = Dimensions.get('window');
 const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 90 : 70;
 const REQUIRED_HOLD_TIME = 1000; // 1 second hold time
+const MAX_RECORDING_TIME = 60; // 60 seconds max recording time
 
 export default function Camera() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -13,12 +14,47 @@ export default function Camera() {
   const [recording, setRecording] = useState(false);
   const [holdTimer, setHoldTimer] = useState(0);
   const [showHoldPopup, setShowHoldPopup] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(MAX_RECORDING_TIME);
   const cameraRef = useRef<any>(null);
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     requestPermission();
   }, []);
+
+  useEffect(() => {
+    if (recording) {
+      setRemainingTime(MAX_RECORDING_TIME);
+      recordingTimerRef.current = setInterval(() => {
+        setRemainingTime(prev => {
+          if (prev <= 1) {
+            stopRecording();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      setRemainingTime(MAX_RECORDING_TIME);
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+    };
+  }, [recording]);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
 
   if (!permission?.granted) {
     return (
@@ -98,6 +134,10 @@ export default function Camera() {
         </View>
       )}
       
+      <View style={styles.timerContainer}>
+        <Text style={styles.timerText}>{formatTime(remainingTime)}</Text>
+      </View>
+      
       <View style={styles.controlsContainer}>
         <TouchableOpacity
           style={styles.flipButton}
@@ -151,6 +191,20 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
+  },
+  timerContainer: {
+    position: 'absolute',
+    top: '7%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  timerText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 18,
   },
   flipButton: {
     alignItems: 'center',
