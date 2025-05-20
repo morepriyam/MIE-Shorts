@@ -1,7 +1,7 @@
-import { StyleSheet, View } from 'react-native';
-import CameraView from '../../components/CameraView';
+import CameraView from "@/components/CameraView";
+import { StyleSheet, View } from "react-native";
 
-export default function CameraScreen() {
+export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <CameraView />
@@ -12,6 +12,8 @@ export default function CameraScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
   },
-}); 
+  camera: {
+    flex: 1,
+  },
+});

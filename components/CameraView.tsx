@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
+import { CameraType, CameraView } from "expo-camera";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
@@ -22,7 +22,6 @@ interface VideoSegment {
 }
 
 export default function Camera() {
-  const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>("back");
   const [recording, setRecording] = useState(false);
   const [holdTimer, setHoldTimer] = useState(0);
@@ -34,10 +33,6 @@ export default function Camera() {
   const cameraRef = useRef<any>(null);
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    requestPermission();
-  }, []);
 
   useEffect(() => {
     if (recording) {
@@ -74,22 +69,6 @@ export default function Camera() {
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
-
-  if (!permission?.granted) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>
-          We need your permission to show the camera
-        </Text>
-        <TouchableOpacity
-          style={styles.permissionButton}
-          onPress={requestPermission}
-        >
-          <Text style={styles.permissionButtonText}>Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   const toggleCameraFacing = () => {
     setFacing((current) => (current === "back" ? "front" : "back"));
