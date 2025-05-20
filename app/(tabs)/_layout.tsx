@@ -1,59 +1,49 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { useFirstTimeOpen } from "@/hooks/useFirstTimeOpen";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const backgroundColor = colorScheme === 'dark' 
-    ? 'rgba(21, 23, 24, 0.8)'
-    : 'rgba(255, 255, 255, 0.8)';
+  const colorScheme = useColorScheme();
 
+  const { isFirstTime, isLoading } = useFirstTimeOpen();
+  if (isLoading) return <></>;
+
+  if (isFirstTime) return <Redirect href={"/onboarding"} />;
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
+            // Use a transparent background on iOS to show the blur effect
             position: "absolute",
-            height: 80,
-            paddingBottom: 20,
-            backgroundColor: backgroundColor,
-            borderTopWidth: 0,
           },
-          android: {
-            position: "absolute",
-            height: 60, 
-            backgroundColor: backgroundColor,
-            borderTopWidth: 0,
-          },
-          default: {
-            position: "absolute",
-            backgroundColor: backgroundColor,
-            borderTopWidth: 0,
-          },
+          default: {},
         }),
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Record",
+          title: "Home",
           tabBarIcon: ({ color }) => (
-            <AntDesign size={28} name="videocamera" color={color} />
+            <IconSymbol size={28} name="camera" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="feed"
         options={{
           title: "Shorts",
           tabBarIcon: ({ color }) => (
